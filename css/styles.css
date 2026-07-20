@@ -1,0 +1,1028 @@
+/* ==========================================================================
+   Vantage Gate — landing page
+   ==========================================================================
+
+   Design tokens, taken verbatim from the Figma frame:
+   SaaS-Projects / landing-page-design (node 3607:372)
+
+   Values are transcribed from the design, not approximated. Where a token is
+   expressed in px in Figma, it is converted to rem here against a 16px root
+   so that type and spacing scale with the user's browser font size.
+
+   The font (IBM Plex Sans) is loaded from Google Fonts in index.html.
+
+   Contents
+     1. Tokens
+     2. Reset and base
+     3. Utilities
+     4. Layout
+     5. Header
+     6. Stats row
+     7. Sections and headings
+     8. Buttons
+     9. Overview
+    10. Carousel
+    11. How it works
+    12. Clearances
+    13. Testimonials
+    14. FAQ
+    15. Final CTA
+    16. Lightbox
+    17. Reduced motion
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. Tokens
+   ========================================================================== */
+
+:root {
+
+  /* --- Colour ---------------------------------------------------------- */
+
+  /* Brand */
+  --vg-color-accent: #297aff;              /* Join Waitlist buttons */
+  --vg-color-accent-border: #797979;       /* 1px border on those buttons */
+
+  /* Text */
+  --vg-color-text: #ffffff;                /* body copy, headings, stats */
+  --vg-color-text-brand: #ebebeb;          /* "Vantage Gate" wordmark only */
+  --vg-color-text-on-panel: #000000;       /* captions on the light screenshot panel */
+
+  /* Surfaces */
+  --vg-color-surface: rgb(0 0 0 / 0.5);    /* all cards: how-it-works, clearances,
+                                              testimonials, FAQ, CTA */
+  --vg-color-panel: #a4c3ff;               /* screenshot carousel panel */
+
+  /* Base — sits behind the aurora background image, and shows in the moment
+     before it loads. Deep navy, matched to the darkest region of the image. */
+  --vg-color-base: #041028;
+
+  /* Lines */
+  --vg-color-divider: rgb(217 217 217 / 0.5);  /* between FAQ items */
+  --vg-color-rule: rgb(255 255 255 / 0.5);     /* stat separators, header rule */
+
+  /* --- Effects --------------------------------------------------------- */
+
+  --vg-blur-card: 7.5px;                   /* backdrop-filter on every card */
+
+  /* --- Typography ------------------------------------------------------ */
+
+  --vg-font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI",
+                    sans-serif;
+
+  --vg-font-weight-regular: 400;
+  --vg-font-weight-medium: 500;            /* clearance badge labels */
+  --vg-font-weight-semibold: 600;          /* section headings, stat labels, buttons */
+  --vg-font-weight-bold: 700;              /* wordmark */
+
+  /* Type scale (42 / 40 / 32 / 24 / 16 px) */
+  --vg-font-size-xl: 2.625rem;             /* 42px — "Vantage Gate" */
+  --vg-font-size-lg: 2.5rem;               /* 40px — clearance badges */
+  --vg-font-size-md: 2rem;                 /* 32px — header subtitle */
+  --vg-font-size-sm: 1.5rem;               /* 24px — section headings, overview,
+                                                     carousel captions */
+  --vg-font-size-base: 1rem;               /* 16px — body copy, stats, buttons */
+
+  /* Line height */
+  --vg-line-height-tight: 1.1;             /* wordmark, clearance badges */
+  --vg-line-height-heading: 1.25;          /* section headings, subtitle */
+  --vg-line-height-body: 1.55;             /* everything else */
+
+  /* Letter spacing */
+  --vg-letter-spacing-xl: -0.02em;         /* -0.84px at 42px */
+
+  /* --- Spacing ---------------------------------------------------------
+
+     The design uses an irregular scale rather than a strict multiple, so
+     each value is named for its role instead of a step number. */
+
+  --vg-space-3xs: 0.625rem;                /* 10px — badge padding */
+  --vg-space-2xs: 1rem;                    /* 16px — stat separator inset */
+  --vg-space-xs: 1.125rem;                 /* 18px — card padding, intra-card gap */
+  --vg-space-sm: 1.25rem;                  /* 20px — button padding, inline */
+  --vg-space-md: 1.375rem;                 /* 22px — clearance badge to caption */
+  --vg-space-lg: 1.5rem;                   /* 24px — clearance column gap */
+  --vg-space-xl: 2rem;                     /* 32px — heading to content, FAQ padding */
+  --vg-space-2xl: 2.1875rem;               /* 35px — between cards in a row */
+  --vg-space-3xl: 2.4375rem;               /* 39px — header block to main */
+  --vg-space-4xl: 2.5rem;                  /* 40px — between clearance rows */
+  --vg-space-5xl: 3.75rem;                 /* 60px — between main sections */
+
+  /* Button padding is asymmetric in the design: 16px vertical, 20px horizontal */
+  --vg-space-button-y: 1rem;               /* 16px */
+
+  /* --- Radii ----------------------------------------------------------- */
+
+  --vg-radius-card: 0.5rem;                /* 8px — cards, buttons, screenshots */
+  --vg-radius-badge: 1.5rem;               /* 24px — clearance badges */
+
+  /* --- Layout ----------------------------------------------------------
+
+     1200px is a max-width, not a fixed width. Below it the column is fluid
+     and gutters keep the content off the viewport edge. */
+
+  --vg-container-width: 75rem;             /* 1200px */
+  --vg-container-gutter: 1.5rem;           /* 24px each side on small screens */
+
+  /* Slides visible in the carousel. main.js reads this value so that the
+     script and the stylesheet can never disagree about how far to advance.
+     Overridden per breakpoint below. */
+  --vg-carousel-slides: 1;
+  --vg-carousel-gap: 1.5rem;
+
+  /* --- Motion ----------------------------------------------------------
+
+     Every transition using these is wrapped in a
+     prefers-reduced-motion: no-preference query. */
+
+  --vg-transition-fast: 150ms ease;
+  --vg-transition-slide: 400ms ease;       /* carousel track */
+}
+
+
+/* ==========================================================================
+   2. Reset and base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.page {
+  min-height: 100vh;
+  font-family: var(--vg-font-family);
+  font-size: var(--vg-font-size-base);
+  line-height: var(--vg-line-height-body);
+  color: var(--vg-color-text);
+
+  /* Aurora artwork sits behind everything. The base colour shows through
+     before it loads, and beyond its edges on very tall viewports. */
+  background-color: var(--vg-color-base);
+  background-image: url("../images/page background image (1).png");
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: cover;
+  background-attachment: fixed;
+
+  /* Prevents a sideways scrollbar if any child overshoots */
+  overflow-x: hidden;
+}
+
+/* background-attachment: fixed is expensive to composite on touch devices and
+   is ignored outright by iOS Safari, so it is dropped there. */
+@media (hover: none) {
+  .page {
+    background-attachment: scroll;
+  }
+}
+
+
+/* ==========================================================================
+   3. Utilities
+   ========================================================================== */
+
+/* Visible only to screen readers. .sr-only is MailerLite's name for the same
+   thing, used inside the embedded form. */
+.visually-hidden,
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Hidden until focused by keyboard */
+.skip-link {
+  position: absolute;
+  top: var(--vg-space-2xs);
+  left: var(--vg-space-2xs);
+  z-index: 100;
+  padding: var(--vg-space-3xs) var(--vg-space-sm);
+  color: var(--vg-color-text);
+  background-color: var(--vg-color-accent);
+  border-radius: var(--vg-radius-card);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* One consistent focus ring across every interactive element */
+:where(a, button, [tabindex]):focus-visible {
+  outline: 3px solid var(--vg-color-text);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+
+/* ==========================================================================
+   4. Layout
+   ========================================================================== */
+
+.page__inner {
+  width: 100%;
+
+  /* The gutter is padding, and box-sizing is border-box, so the max-width has
+     to include it for the content column itself to reach 1200px on wide
+     screens. Without this the content would cap at 1200 minus gutters. */
+  max-width: calc(var(--vg-container-width) + (var(--vg-container-gutter) * 2));
+  margin-inline: auto;
+  padding-inline: var(--vg-container-gutter);
+  padding-block: var(--vg-space-4xl);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--vg-space-xl);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+
+  /* Tightened on small screens — 60px between every section is a lot of
+     scrolling on a phone. Restored to the design value at 48rem. */
+  gap: var(--vg-space-4xl);
+}
+
+
+/* ==========================================================================
+   5. Header
+   ========================================================================== */
+
+.site-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vg-space-xl);
+
+  /* The rule beneath the stats row */
+  padding-bottom: var(--vg-space-xl);
+  border-bottom: 1px solid var(--vg-color-rule);
+}
+
+.site-header__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--vg-space-lg);
+}
+
+.site-header__logo {
+  flex-shrink: 0;
+  width: 5.625rem;                         /* 90px, scaled up at wide sizes */
+}
+
+.site-header__brand {
+  display: flex;
+  flex: 1 1 12rem;
+  flex-direction: column;
+  gap: var(--vg-space-3xs);
+}
+
+/* On narrow screens the button wraps onto its own line, where a full-width
+   target is easier to hit than a stub floating at the left. */
+.site-header__bar > .button {
+  flex: 1 0 100%;
+}
+
+.site-header__name {
+  font-size: var(--vg-font-size-sm);
+  font-weight: var(--vg-font-weight-bold);
+  line-height: var(--vg-line-height-tight);
+  letter-spacing: var(--vg-letter-spacing-xl);
+  color: var(--vg-color-text-brand);
+}
+
+.site-header__subtitle {
+  font-size: var(--vg-font-size-base);
+  font-weight: var(--vg-font-weight-regular);
+  line-height: var(--vg-line-height-heading);
+}
+
+
+/* ==========================================================================
+   6. Stats row
+   ========================================================================== */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--vg-space-sm) 0;
+}
+
+.stats__item {
+  padding-left: var(--vg-space-2xs);
+  border-left: 1px solid var(--vg-color-rule);
+}
+
+/* The leftmost item in each row has no separator before it */
+.stats__item:nth-child(odd) {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.stats__label {
+  font-weight: var(--vg-font-weight-semibold);
+}
+
+.stats__value {
+  font-weight: var(--vg-font-weight-regular);
+}
+
+
+/* ==========================================================================
+   7. Sections and headings
+   ========================================================================== */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vg-space-xl);
+}
+
+.section__heading {
+  font-size: var(--vg-font-size-sm);
+  font-weight: var(--vg-font-weight-semibold);
+  line-height: var(--vg-line-height-heading);
+}
+
+
+/* ==========================================================================
+   8. Buttons
+   ========================================================================== */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 44px minimum touch target */
+  min-height: 2.75rem;
+  padding: var(--vg-space-button-y) var(--vg-space-sm);
+
+  font-size: var(--vg-font-size-base);
+  font-weight: var(--vg-font-weight-semibold);
+  line-height: 1;
+  text-align: center;
+
+  border-radius: var(--vg-radius-card);
+  cursor: pointer;
+}
+
+.button--primary {
+  color: var(--vg-color-text);
+  background-color: var(--vg-color-accent);
+  border: 1px solid var(--vg-color-accent-border);
+}
+
+
+/* ==========================================================================
+   9. Overview
+   ========================================================================== */
+
+/* The design sets this at 24px, which is comfortable in a 1200px column but
+   oversized in a 320px one. Scales up to the design value at 64rem. */
+.overview {
+  font-size: 1.125rem;
+  line-height: var(--vg-line-height-body);
+}
+
+
+/* ==========================================================================
+   10. Carousel
+
+   The viewport clips; the track slides. Slide width is derived from
+   --vg-carousel-slides so that changing the breakpoint value is enough to
+   change how many are visible — the JS reads the same custom property.
+
+   Without JS the viewport scrolls horizontally with snap points, so every
+   slide stays reachable.
+   ========================================================================== */
+
+/* On small screens the arrows would steal ~90px of a 320px viewport, leaving
+   the screenshot unreadably narrow. So the viewport takes the full width and
+   the arrows sit beneath it, centred. From 48rem they move back to the sides
+   as in the design. */
+.section--carousel {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vg-space-xs);
+}
+
+.carousel__viewport {
+  order: -1;
+  flex: 1 0 100%;
+}
+
+.carousel__viewport {
+  min-width: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+
+  /* Hidden once JS takes over; see .carousel__viewport[data-enhanced] */
+  scrollbar-width: none;
+}
+
+.carousel__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+/* JS sets this, at which point the track is driven by transform instead */
+.carousel__viewport[data-enhanced] {
+  overflow-x: hidden;
+  scroll-snap-type: none;
+}
+
+.carousel__track {
+  display: flex;
+  gap: var(--vg-carousel-gap);
+}
+
+.carousel__slide {
+  flex: 0 0 calc(
+    (100% - (var(--vg-carousel-gap) * (var(--vg-carousel-slides) - 1)))
+    / var(--vg-carousel-slides)
+  );
+  scroll-snap-align: start;
+}
+
+/* The whole slide is the lightbox trigger, so it must look like a plain
+   image rather than a button */
+.carousel__trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: var(--vg-radius-card);
+  cursor: zoom-in;
+}
+
+.carousel__image {
+  width: 100%;
+  height: auto;
+  border-radius: var(--vg-radius-card);
+  background-color: var(--vg-color-panel);
+}
+
+.carousel__arrow {
+  flex-shrink: 0;
+
+  /* 44px minimum touch target */
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+
+  color: var(--vg-color-text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.carousel__arrow svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.carousel__arrow[disabled] {
+  opacity: 0.3;
+  cursor: default;
+}
+
+
+/* ==========================================================================
+   11. How it works
+   ========================================================================== */
+
+.how {
+  display: grid;
+  gap: var(--vg-space-2xl);
+}
+
+.how__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vg-space-xs);
+  padding: var(--vg-space-xs);
+
+  background-color: var(--vg-color-surface);
+  -webkit-backdrop-filter: blur(var(--vg-blur-card));
+  backdrop-filter: blur(var(--vg-blur-card));
+  border-radius: var(--vg-radius-card);
+}
+
+.how__icon {
+  color: var(--vg-color-text);
+}
+
+.how__icon svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+
+/* ==========================================================================
+   12. Clearances
+   ========================================================================== */
+
+.clearances {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--vg-space-4xl) var(--vg-space-lg);
+}
+
+.clearance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vg-space-md);
+}
+
+.clearance__badge {
+  display: grid;
+  place-items: center;
+  height: 9.375rem;                        /* 150px */
+  padding: var(--vg-space-3xs);
+
+  font-size: var(--vg-font-size-lg);
+  font-weight: var(--vg-font-weight-medium);
+  line-height: var(--vg-line-height-tight);
+
+  background-color: var(--vg-color-surface);
+  -webkit-backdrop-filter: blur(var(--vg-blur-card));
+  backdrop-filter: blur(var(--vg-blur-card));
+  border-radius: var(--vg-radius-badge);
+}
+
+.clearance__caption {
+  text-align: center;
+}
+
+
+/* ==========================================================================
+   13. Testimonials
+   ========================================================================== */
+
+.testimonials {
+  display: grid;
+  gap: var(--vg-space-2xl);
+}
+
+.testimonial {
+  display: flex;
+  flex-direction: column;
+
+  /* Attribution sits at the foot of the card regardless of quote length,
+     so the two cards line up */
+  justify-content: space-between;
+  gap: var(--vg-space-xs);
+  padding: var(--vg-space-xs);
+
+  background-color: var(--vg-color-surface);
+  -webkit-backdrop-filter: blur(var(--vg-blur-card));
+  backdrop-filter: blur(var(--vg-blur-card));
+  border-radius: var(--vg-radius-card);
+}
+
+.testimonial__quote {
+  font-style: italic;
+}
+
+
+/* ==========================================================================
+   14. FAQ
+
+   One card containing all three items, separated by rules.
+   ========================================================================== */
+
+/* 32px padding inside a 320px viewport leaves very little room for the
+   answers, so it is reduced on small screens and restored at 48rem. */
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vg-space-xs);
+  padding: var(--vg-space-xs);
+
+  background-color: var(--vg-color-surface);
+  -webkit-backdrop-filter: blur(var(--vg-blur-card));
+  backdrop-filter: blur(var(--vg-blur-card));
+  border-radius: var(--vg-radius-card);
+}
+
+.faq__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vg-space-xs);
+}
+
+/* Rule above every item except the first */
+.faq__item + .faq__item {
+  padding-top: var(--vg-space-xs);
+  border-top: 1px solid var(--vg-color-divider);
+}
+
+.faq__answer {
+  margin: 0;
+}
+
+
+/* ==========================================================================
+   15. Final CTA
+   ========================================================================== */
+
+.cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--vg-space-xs);
+  padding: var(--vg-space-xs);
+
+  text-align: center;
+
+  background-color: var(--vg-color-surface);
+  -webkit-backdrop-filter: blur(var(--vg-blur-card));
+  backdrop-filter: blur(var(--vg-blur-card));
+  border-radius: var(--vg-radius-card);
+}
+
+.cta__heading {
+  font-size: var(--vg-font-size-sm);
+  font-weight: var(--vg-font-weight-semibold);
+  line-height: var(--vg-line-height-heading);
+}
+
+
+/* ==========================================================================
+   16. MailerLite embedded form
+
+   MailerLite's own <style> block was stripped from the embed (it was a wall
+   of !important light-theme rules that fought the page). The form is styled
+   here from scratch instead, scoped to the container id so nothing leaks.
+   The class names are MailerLite's own, kept so webforms.min.js still works.
+
+   Inputs are kept light (white on the dark card) for contrast and to match
+   the popup mock the design was signed off against; the submit button mirrors
+   .button--primary.
+   ========================================================================== */
+
+#mlb2-43908534.ml-form-embedContainer {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+}
+
+#mlb2-43908534 .ml-form-embedWrapper {
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+}
+
+#mlb2-43908534 .ml-form-formContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vg-space-xs);
+  margin-bottom: var(--vg-space-xs);
+}
+
+#mlb2-43908534 .form-control {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--vg-space-3xs) var(--vg-space-2xs);
+
+  font-family: var(--vg-font-family);
+  font-size: var(--vg-font-size-base);
+  color: var(--vg-color-text);
+  background-color: rgb(255 255 255 / 0.15);
+
+  border: 1px solid var(--vg-color-accent-border);
+  border-radius: var(--vg-radius-card);
+}
+
+#mlb2-43908534 .form-control::placeholder {
+  color: rgb(255 255 255 / 0.6);
+}
+
+#mlb2-43908534 .form-control:focus-visible {
+  outline: 3px solid var(--vg-color-text);
+  outline-offset: 2px;
+}
+
+#mlb2-43908534 .ml-form-embedSubmit {
+  width: 100%;
+}
+
+/* Mirrors .button--primary */
+#mlb2-43908534 .ml-form-embedSubmit button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--vg-space-button-y) var(--vg-space-sm);
+
+  font-family: var(--vg-font-family);
+  font-size: var(--vg-font-size-base);
+  font-weight: var(--vg-font-weight-semibold);
+  line-height: 1;
+  color: var(--vg-color-text);
+
+  background-color: var(--vg-color-accent);
+  border: 1px solid var(--vg-color-accent-border);
+  border-radius: var(--vg-radius-card);
+  cursor: pointer;
+}
+
+#mlb2-43908534 .ml-form-successContent {
+  color: var(--vg-color-text);
+}
+
+#mlb2-43908534 .ml-form-successContent h4 {
+  margin-bottom: var(--vg-space-3xs);
+  font-size: var(--vg-font-size-sm);
+  font-weight: var(--vg-font-weight-semibold);
+}
+
+/* Error state — webforms.min.js adds .ml-error to an invalid field's row */
+#mlb2-43908534 .ml-error .form-control {
+  border-color: #ff6b6b;
+}
+
+/* Submit spinner, kept from MailerLite's stylesheet since it is self-contained */
+.ml-form-embedSubmitLoad {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+
+.ml-form-embedSubmitLoad::after {
+  content: " ";
+  display: block;
+  width: 11px;
+  height: 11px;
+  margin: 1px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  border-color: #fff #fff #fff transparent;
+  animation: ml-form-embedSubmitLoad 1.2s linear infinite;
+}
+
+@keyframes ml-form-embedSubmitLoad {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+/* ==========================================================================
+   17. Lightbox
+
+   Styling only — the open/close behaviour, focus trap and Escape handling
+   arrive with main.js in step 6.
+   ========================================================================== */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+
+  display: grid;
+  place-items: center;
+  padding: var(--vg-container-gutter);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgb(0 0 0 / 0.8);
+}
+
+.lightbox__dialog {
+  position: relative;
+  max-width: min(100%, 75rem);
+}
+
+.lightbox__image {
+  width: 100%;
+  height: auto;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: var(--vg-radius-card);
+}
+
+.lightbox__close {
+  position: absolute;
+  top: calc(var(--vg-space-xs) * -1);
+  right: calc(var(--vg-space-xs) * -1);
+
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+
+  color: var(--vg-color-text);
+  background-color: var(--vg-color-base);
+  border: 1px solid var(--vg-color-rule);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.lightbox__close svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+
+/* ==========================================================================
+   18. Breakpoints
+
+   Mobile-first. Two breakpoints:
+     48rem (768px)  — cards go multi-column, stats to five across
+     64rem (1024px) — full design type scale and two-up carousel
+
+   Step 5 verifies these at 320 / 768 / 1024 / 1440.
+   ========================================================================== */
+
+@media (min-width: 48em) {
+
+  .page__inner {
+    padding-block: var(--vg-space-5xl);
+    gap: var(--vg-space-3xl);
+  }
+
+  .main {
+    gap: var(--vg-space-5xl);
+  }
+
+  .site-header__bar > .button {
+    flex: 0 0 auto;
+  }
+
+  .site-header__brand {
+    flex: 1 1 15rem;
+    gap: var(--vg-space-xs);
+  }
+
+  .site-header__name {
+    font-size: var(--vg-font-size-md);
+  }
+
+  .site-header__subtitle {
+    font-size: var(--vg-font-size-sm);
+  }
+
+  .stats {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  /* Only the very first item loses its separator once all five are in a row */
+  .stats__item:nth-child(odd) {
+    padding-left: var(--vg-space-2xs);
+    border-left: 1px solid var(--vg-color-rule);
+  }
+
+  .stats__item:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .how {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .clearances {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .testimonials {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Card padding returns to the design value once there is room for it */
+  .faq {
+    gap: var(--vg-space-xl);
+    padding: var(--vg-space-xl);
+  }
+
+  .faq__item + .faq__item {
+    padding-top: var(--vg-space-xl);
+  }
+
+  .cta {
+    padding: var(--vg-space-xl);
+  }
+
+  /* Arrows return to either side of the viewport */
+  .section--carousel {
+    flex-wrap: nowrap;
+    gap: var(--vg-space-sm);
+  }
+
+  .carousel__viewport {
+    order: 0;
+    flex: 1 1 auto;
+  }
+
+  :root {
+    --vg-carousel-slides: 2;
+  }
+}
+
+@media (min-width: 64em) {
+
+  .overview {
+    font-size: var(--vg-font-size-sm);
+  }
+
+  .site-header__logo {
+    width: 9.375rem;                       /* 150px, as in the design */
+  }
+
+  .site-header__bar {
+    gap: var(--vg-space-2xl);
+  }
+
+  .site-header__name {
+    font-size: var(--vg-font-size-xl);
+  }
+
+  .site-header__subtitle {
+    font-size: var(--vg-font-size-md);
+  }
+
+  .how__card {
+    /* Cards in a row match height; the design lets the text sit top-aligned */
+    justify-content: flex-start;
+  }
+}
+
+
+/* ==========================================================================
+   19. Reduced motion
+
+   Transitions are opt-in: they only apply when the user has not asked for
+   reduced motion.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+
+  .carousel__track {
+    transition: transform var(--vg-transition-slide);
+  }
+
+  .button,
+  .carousel__arrow {
+    transition: opacity var(--vg-transition-fast),
+                background-color var(--vg-transition-fast);
+  }
+
+  .button--primary:hover {
+    opacity: 0.9;
+  }
+
+  .carousel__arrow:not([disabled]):hover {
+    opacity: 0.7;
+  }
+}
